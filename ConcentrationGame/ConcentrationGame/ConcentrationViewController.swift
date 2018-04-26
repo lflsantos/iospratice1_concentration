@@ -23,10 +23,21 @@ class ConcentrationViewController: UIViewController {
         return (cardButtons.count + 1)/2
     }
     
-    private(set) var flipCount = 0 {
-        didSet{
-            updateFlipCountLabel()
-        }
+    
+    
+    private var emojiChoices : String = ""
+    
+    private var emoji = [Card : String]()
+    
+    @IBOutlet weak var newGameButton: UILabel!
+    
+    @IBOutlet weak var scoreLabel: UILabel!
+    
+    
+    
+    
+    override func viewWillAppear(_ animated: Bool) {
+        emojiChoices = game.getRandomTheme()
     }
     
     private func updateFlipCountLabel(){
@@ -34,14 +45,14 @@ class ConcentrationViewController: UIViewController {
             .strokeWidth: 5.0,
             .strokeColor: UIColor.orange
         ]
-        let attributedString = NSAttributedString(string: "Flips: \(flipCount)", attributes: attributes)
+        let attributedString = NSAttributedString(string: "Flips: \(game.flipCount)", attributes: attributes)
         flipCountLabel.attributedText = attributedString
     }
     
     @IBAction func touchCard(_ sender: UIButton) {
-        flipCount += 1
         if let cardNumber = cardButtons.index(of: sender){
             game.chooseCard(at: cardNumber)
+            updateFlipCountLabel()
             updateViewFromModel()
         }else{
             print("choosen card was not in cardButtons")
@@ -62,16 +73,21 @@ class ConcentrationViewController: UIViewController {
         }
     }
     
-    private var emojiChoices = "🐶🐱🐭🦊🐼🐨🐯🦁🐮🐷🐸🐵"
-    
-    private var emoji = [Card : String]()
-    
     private func emoji(for card: Card) -> String {
         if emoji[card] == nil, emojiChoices.count > 0 {
             let stringIndex = emojiChoices.index(emojiChoices.startIndex, offsetBy: emojiChoices.count.arc4Random)
             emoji[card] = String(emojiChoices.remove(at: stringIndex))
         }
         return emoji[card] ?? "?"
+    }
+    
+    
+    @IBAction func newGame(_ sender: UIButton) {
+        game.restartGame()
+        emoji = [Card : String]()
+        emojiChoices = game.getRandomTheme()
+        updateViewFromModel()
+        updateFlipCountLabel()
     }
     
 }

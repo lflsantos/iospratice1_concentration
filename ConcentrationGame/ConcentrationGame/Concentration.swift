@@ -22,8 +22,24 @@ class Concentration {
         }
     }
     
+    private(set) var flipCount = 0
+    private var themes = ["🐶🐱🐭🦊🐼🐨🐯🦁🐮🐷🐸🐵",
+                          "🍏🍐🍊🍎🍋🍌🍉🍇🍓🍈🍒🍑🍍",
+                          "⚽️🏀🏈⚾️🥊🏓🎾🏐🏉🎱🏸",
+                          "🚗🚕🚌🚲🛵🚃🚂🛩🚀🚁⛴"]
+    
+    init(numberOfPairsOfCards: Int){
+        assert(numberOfPairsOfCards > 0, "Concentration.init(\(numberOfPairsOfCards)) : You must have at least one pair of cards")
+        for _ in 1...numberOfPairsOfCards{
+            let  card = Card()
+            cards += [card, card]
+        }
+    }
+
+    
     func chooseCard(at index: Int){
         assert(cards.indices.contains(index), "Concentration.chooseCard(at: \(index)) : Choosen index range")
+        flipCount += 1
         if !cards[index].isMatched {
             if let matchIndex = indexOfFaceUpCard, matchIndex != index{
                 if cards[matchIndex] == cards[index]{
@@ -37,16 +53,19 @@ class Concentration {
         }
     }
     
-    init(numberOfPairsOfCards: Int){
-        assert(numberOfPairsOfCards > 0, "Concentration.init(\(numberOfPairsOfCards)) : You must have at least one pair of cards")
-        for _ in 1...numberOfPairsOfCards{
-            let  card = Card()
-            cards += [card, card]
+    func restartGame(){
+        for index in cards.indices{
+            cards[index].isMatched = false
+            cards[index].isFaceUp = false
         }
-        
-        //shuffle cards
+        indexOfFaceUpCard = nil
+        flipCount = 0
     }
     
+    func getRandomTheme() -> String{
+        let rand = (themes.count-1).arc4Random
+        return themes[rand]
+    }
 }
 
 extension Collection{
@@ -54,3 +73,5 @@ extension Collection{
         return count == 1 ? first : nil
     }
 }
+
+
